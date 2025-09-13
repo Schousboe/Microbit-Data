@@ -6,7 +6,7 @@
 </head>
 <body>
   <h1>Micro:bit Data</h1>
-  <button id="connect">Tilslut Micro:bit</button>
+  <button id="connect">Connect Micro:bit</button>
   <pre id="output"></pre>
 
   <script>
@@ -16,53 +16,20 @@
         await port.open({ baudRate: 115200 });
 
         const decoder = new TextDecoderStream();
-        const readableStreamClosed = port.readable.pipeTo(decoder.writable);
-
-        // Her bruger vi LineBreakTransformer
-        const reader = decoder.readable
-          .pipeThrough(new TransformStream(new LineBreakTransformer()))
-          .getReader();
+        const reader = port.readable.pipeThrough(decoder).getReader();
 
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
-<<<<<<< HEAD
-          if (value) {
-            const output = document.getElementById("output");
-            output.textContent += value + "\n"; // tilføj ny linje
-            output.scrollTop = output.scrollHeight; // auto-scroll
-          }
-=======
-          document.getElementById("output").textContent += value;
->>>>>>> parent of ff220e1 (Autoscroll added)
+          const output = document.getElementById("output");
+            output.textContent += value;
+            output.scrollTop = output.scrollHeight; 
+
         }
       } catch (err) {
         console.error(err);
       }
     });
-
-    // Helper der samler linjer
-    class LineBreakTransformer {
-      constructor() {
-        this.container = '';
-      }
-
-      transform(chunk, controller) {
-        this.container += chunk;
-        const lines = this.container.split('\n');
-        this.container = lines.pop(); // gem evt. halv linje
-        lines.forEach(line => controller.enqueue(line));
-      }
-
-      flush(controller) {
-        controller.enqueue(this.container);
-      }
-    }
-
-    if (value.startsWith("light:")) {
-      output.textContent += value + "\n";
-      output.scrollTop = output.scrollHeight;
-    }
   </script>
 </body>
 </html>
