@@ -16,38 +16,44 @@
         await port.open({ baudRate: 115200 });
 
         const decoder = new TextDecoderStream();
-        const reader = port.readable.pipeThrough(decoder).getReader();
+        const readableStreamClosed = port.readable.pipeTo(decoder.writable);
+
+        // Her bruger vi LineBreakTransformer
+        const reader = decoder.readable
+          .pipeThrough(new TransformStream(new LineBreakTransformer()))
+          .getReader();
 
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
-          const output = document.getElementById("output");
-            output.textContent += value;
-            output.scrollTop = output.scrollHeight; 
-
+          if (value) {
+            const output = document.getElementById("output");
+            output.textContent += value + "\n"; // tilføj ny linje
+            output.scrollTop = output.scrollHeight; // auto-scroll
+          }
         }
-      
       } catch (err) {
         console.error(err);
       }
     });
 
+    // Helper der samler linjer
     class LineBreakTransformer {
-  constructor() {
-    this.container = '';
-  }
+      constructor() {
+        this.container = '';
+      }
 
-  transform(chunk, controller) {
-    this.container += chunk;
-    const lines = this.container.split('\n');
-    this.container = lines.pop(); // gem sidste halvfærdige linje
-    lines.forEach(line => controller.enqueue(line));
-  }
+      transform(chunk, controller) {
+        this.container += chunk;
+        const lines = this.container.split('\n');
+        this.container = lines.pop(); // gem evt. halv linje
+        lines.forEach(line => controller.enqueue(line));
+      }
 
-  flush(controller) {
-    controller.enqueue(this.container);
-  }
-}
+      flush(controller) {
+        controller.enqueue(this.container);
+      }
+    }
   </script>
 </body>
 </html>
