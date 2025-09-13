@@ -26,11 +26,15 @@
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
+<<<<<<< HEAD
           if (value) {
             const output = document.getElementById("output");
             output.textContent += value + "\n"; // tilføj ny linje
             output.scrollTop = output.scrollHeight; // auto-scroll
           }
+=======
+          document.getElementById("output").textContent += value;
+>>>>>>> parent of ff220e1 (Autoscroll added)
         }
       } catch (err) {
         console.error(err);
