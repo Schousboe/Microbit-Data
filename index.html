@@ -21,7 +21,10 @@
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
-          document.getElementById("output").textContent += value;
+          const output = document.getElementById("output");
+            output.textContent += value;
+            output.scrollTop = output.scrollHeight; 
+
         }
       } catch (err) {
         console.error(err);
