@@ -6,7 +6,7 @@
 </head>
 <body>
   <h1>Micro:bit Data</h1>
-  <button id="connect">Connect Micro:bit</button>
+  <button id="connect">Tilslut Micro:bit</button>
   <pre id="output"></pre>
 
   <script>
@@ -26,10 +26,28 @@
             output.scrollTop = output.scrollHeight; 
 
         }
+      
       } catch (err) {
         console.error(err);
       }
     });
+
+    class LineBreakTransformer {
+  constructor() {
+    this.container = '';
+  }
+
+  transform(chunk, controller) {
+    this.container += chunk;
+    const lines = this.container.split('\n');
+    this.container = lines.pop(); // gem sidste halvfærdige linje
+    lines.forEach(line => controller.enqueue(line));
+  }
+
+  flush(controller) {
+    controller.enqueue(this.container);
+  }
+}
   </script>
 </body>
 </html>
