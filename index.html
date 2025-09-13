@@ -54,6 +54,11 @@
         controller.enqueue(this.container);
       }
     }
+
+    if (value.startsWith("light:")) {
+      output.textContent += value + "\n";
+      output.scrollTop = output.scrollHeight;
+    }
   </script>
 </body>
 </html>
